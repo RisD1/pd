@@ -1,0 +1,36 @@
+# -------- PYTHON --------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# -------- VIRTUAL ENV --------
+.venv/
+venv/
+env/
+ENV/
+
+# -------- PYCHARM --------
+.idea/
+*.iml
+
+# -------- ENV FILES --------
+.env
+
+# -------- OS FILES --------
+.DS_Store
+Thumbs.db
+
+# -------- LOGS --------
+*.log
+
+# -------- TEST / CACHE --------
+.pytest_cache/
+.cache/
+
+# -------- BUILD FILES --------
+build/
+dist/
+*.egg-info/
+
+# -------- SQLITE (if you add later) --------
+*.db
