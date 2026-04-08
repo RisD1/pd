@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<p id="status"></p>
+
+<h3>Rounds</h3>
+<input id="rounds" type="number" value="5">
+<button id="startBtn" onclick="startGame()" disabled>Start Game</button>
+
+<h3>Waiting Room</h3>
+<ul id="players"></ul>
+
+<h3>Games</h3>
+<div id="liveGames"></div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="/static/client.js"></script>
+
+</body>
+</html>

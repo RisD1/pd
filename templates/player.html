@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<h2>Join Game</h2>
+
+<input id="name" placeholder="Enter name">
+<button id="joinBtn" onclick="join()">Join</button>
+
+<h3>Waiting Room</h3>
+<ul id="players"></ul>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="/static/client.js"></script>
+
+</body>
+</html>
