@@ -1,16 +1,28 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room
 import random
+import os
+import json
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode='threading')
 
+# -------- DATA --------
 players = {}
 waiting_players = []
 games = {}
-finished_games = {}
 admin_sid = None
+
+SAVE_FILE = "games_history.json"
+
+# Load history
+if os.path.exists(SAVE_FILE):
+    with open(SAVE_FILE, "r") as f:
+        finished_games = json.load(f)
+else:
+    finished_games = {}
 
 
 # -------- ROUTES --------
@@ -42,6 +54,11 @@ def payoff(c1, c2):
     return (1, 1)
 
 
+def save_history():
+    with open(SAVE_FILE, "w") as f:
+        json.dump(finished_games, f)
+
+
 def send_games_update():
     if not admin_sid:
         return
@@ -63,8 +80,8 @@ def send_games_update():
         }
 
     # FINISHED GAMES
-    for room_id, game in finished_games.items():
-        dashboard[room_id] = game
+    for game_id, game in finished_games.items():
+        dashboard[game_id] = game
 
     socketio.emit("games_data", dashboard, room=admin_sid)
 
@@ -101,14 +118,11 @@ def get_games():
 
 @socketio.on('start_game')
 def handle_start_game(data):
-    global admin_sid, finished_games
+    global admin_sid
 
     if request.sid != admin_sid:
         socketio.emit("not_admin", room=request.sid)
         return
-
-    # 🔥 clear finished games
-    finished_games.clear()
 
     if len(games) > 0:
         socketio.emit("game_in_progress", room=request.sid)
@@ -118,7 +132,7 @@ def handle_start_game(data):
         socketio.emit("no_players", room=request.sid)
         return
 
-    total_rounds = data.get("rounds", 10)
+    total_rounds = data.get("rounds", 5)
 
     shuffled = waiting_players[:]
     random.shuffle(shuffled)
@@ -178,7 +192,8 @@ def handle_move(data):
 
     game["choices"][request.sid] = choice
 
-    if "BOT" in game["players"]:
+    # FIXED BOT LOGIC
+    if "BOT" in game["players"] and "BOT" not in game["choices"]:
         game["choices"]["BOT"] = random.choice(["cooperate", "defect"])
 
     if len(game["choices"]) == len(game["players"]):
@@ -219,20 +234,22 @@ def resolve_round(room):
     if game["round"] >= game["total_rounds"]:
         socketio.emit("game_over", game["history"], room=room)
 
-        p1, p2 = game["players"]
-
         name1 = "BOT" if p1 == "BOT" else players.get(p1, "Unknown")
         name2 = "BOT" if p2 == "BOT" else players.get(p2, "Unknown")
 
         total1 = sum(r["p1_score"] for r in game["history"])
         total2 = sum(r["p2_score"] for r in game["history"])
 
-        finished_games[room] = {
+        game_id = f"{room}_{int(time.time())}"
+
+        finished_games[game_id] = {
             "players": [name1, name2],
             "history": game["history"],
             "total_scores": [total1, total2],
             "status": "finished"
         }
+
+        save_history()
 
         del games[room]
         send_games_update()
@@ -271,8 +288,6 @@ def handle_disconnect():
     send_games_update()
 
 
-import os
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host="0.0.0.0", port=port)
+    socketio.run(app, host="0.0.0.0", port=port, allow_unsafe_werkzeug=True)

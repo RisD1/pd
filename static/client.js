@@ -315,7 +315,5 @@ socket.on("no_players", () => {
 });
 
 
-// -------- DASHBOARD POLLING --------
-setInterval(() => {
-    socket.emit("get_games");
-}, 2000);
+
+
