@@ -46,7 +46,7 @@ def get_waiting_list():
 
 def payoff(c1, c2):
     if c1 == "cooperate" and c2 == "cooperate":
-        return (2, 2)
+        return (3, 3)
     if c1 == "cooperate" and c2 == "defect":
         return (0, 5)
     if c1 == "defect" and c2 == "cooperate":
