@@ -166,7 +166,7 @@ socket.on("game_start", (data) => {
                     </tr>
                     <tr>
                         <th>You C</th>
-                        <td>2,2</td>
+                        <td>3,3</td>
                         <td>0,5</td>
                     </tr>
                     <tr>
